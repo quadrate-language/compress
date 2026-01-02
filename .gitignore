@@ -1,0 +1,5 @@
+# Build artifacts (quadpm generates these)
+/lib/
+*.o
+*.a
+*.so

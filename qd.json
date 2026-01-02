@@ -1,0 +1,13 @@
+{
+	"name": "compress",
+	"version": "0.1.0",
+	"namespace": "compress",
+	"description": "Compression and decompression using gzip/zlib",
+	"license": "Apache-2.0",
+	"repository": "https://github.com/quadrate-language/compress",
+	"keywords": ["compression", "gzip", "zlib", "deflate"],
+	"quadrate": ">=0.4.0",
+	"native": {
+		"link": ["z"]
+	}
+}
