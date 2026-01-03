@@ -38,7 +38,7 @@ pub const LevelDefault = 6
 /// Compression level: best (most compression, slowest).
 pub const LevelBest = 9
 
-import "libqdcompress.a" as "compress" {
+import "libqdcompress_static.a" as "compress" {
 	/// Compress data using gzip format with default compression level.
 	///
 	/// @param data str Data to compress
