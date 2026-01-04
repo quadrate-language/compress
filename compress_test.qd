@@ -1,0 +1,78 @@
+// Unit tests for the compress module
+use compress
+use str
+use testing
+
+test "compress::gzip roundtrip" {
+	"Hello, World!" compress::gzip! compress::gunzip! "Hello, World!" testing::assert_eq
+	"The quick brown fox" compress::gzip! compress::gunzip! "The quick brown fox" testing::assert_eq
+}
+
+test "compress::gzip empty string" {
+	"" compress::gzip! compress::gunzip! "" testing::assert_eq
+}
+
+test "compress::deflate roundtrip" {
+	"Hello, World!" compress::deflate! compress::inflate! "Hello, World!" testing::assert_eq
+	"Test data" compress::deflate! compress::inflate! "Test data" testing::assert_eq
+}
+
+test "compress::deflate empty string" {
+	"" compress::deflate! compress::inflate! "" testing::assert_eq
+}
+
+test "compress::gzip_level fast" {
+	"The quick brown fox" compress::LevelFast compress::gzip_level! compress::gunzip!
+	"The quick brown fox" testing::assert_eq
+}
+
+test "compress::gzip_level default" {
+	"The quick brown fox" compress::LevelDefault compress::gzip_level! compress::gunzip!
+	"The quick brown fox" testing::assert_eq
+}
+
+test "compress::gzip_level best" {
+	"The quick brown fox" compress::LevelBest compress::gzip_level! compress::gunzip!
+	"The quick brown fox" testing::assert_eq
+}
+
+test "compress single character" {
+	"x" compress::gzip! compress::gunzip! "x" testing::assert_eq
+	"x" compress::deflate! compress::inflate! "x" testing::assert_eq
+}
+
+test "compress repeated characters" {
+	"AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"
+	compress::gzip! compress::gunzip!
+	"AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA" testing::assert_eq
+}
+
+test "compress special characters" {
+	"line1\nline2\nline3\ttab\there" compress::gzip! compress::gunzip!
+	"line1\nline2\nline3\ttab\there" testing::assert_eq
+}
+
+test "compress unicode" {
+	"Hello 世界 🎉" compress::gzip! compress::gunzip! "Hello 世界 🎉" testing::assert_eq
+	"Hello 世界 🎉" compress::deflate! compress::inflate! "Hello 世界 🎉" testing::assert_eq
+}
+
+test "compress whitespace" {
+	"   \t\t\t\n\n\n   " compress::gzip! compress::gunzip! "   \t\t\t\n\n\n   " testing::assert_eq
+}
+
+test "compress double compression" {
+	"test data" compress::gzip! compress::gzip! compress::gunzip! compress::gunzip!
+	"test data" testing::assert_eq
+}
+
+test "compress larger data" {
+	// Build 320 bytes of data
+	"ABCDEFGHIJ" -> chunk
+	chunk chunk str::concat -> data
+	data data str::concat -> data
+	data data str::concat -> data
+	data data str::concat -> data
+	data data str::concat -> data
+	data compress::gzip! compress::gunzip! data testing::assert_eq
+}
