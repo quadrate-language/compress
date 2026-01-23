@@ -29,14 +29,14 @@ static void set_error_msg(qd_context* ctx, const char* msg) {
  * gzip - Compress string using gzip format with default level
  * Stack: (data:str -- compressed:str)!
  */
-qd_exec_result usr_compress_gzip(qd_context* ctx) {
+int usr_compress_gzip(qd_context* ctx) {
 	qd_stack_element_t data_elem;
 	qd_stack_error err = qd_stack_pop(ctx->st, &data_elem);
 
 	if (err != QD_STACK_OK || data_elem.type != QD_STACK_TYPE_STR) {
 		set_error_msg(ctx, "gzip: expected string argument");
 		ctx->error_code = COMPRESS_ERR_INVALID_ARG;
-		return (qd_exec_result){COMPRESS_ERR_INVALID_ARG};
+		return (int){COMPRESS_ERR_INVALID_ARG};
 	}
 
 	const char* input = qd_string_data(data_elem.value.s);
@@ -49,7 +49,7 @@ qd_exec_result usr_compress_gzip(qd_context* ctx) {
 		qd_string_release(data_elem.value.s);
 		set_error_msg(ctx, "gzip: memory allocation failed");
 		ctx->error_code = COMPRESS_ERR_ALLOC;
-		return (qd_exec_result){COMPRESS_ERR_ALLOC};
+		return (int){COMPRESS_ERR_ALLOC};
 	}
 
 	z_stream strm;
@@ -62,7 +62,7 @@ qd_exec_result usr_compress_gzip(qd_context* ctx) {
 		qd_string_release(data_elem.value.s);
 		set_error_msg(ctx, "gzip: deflateInit2 failed");
 		ctx->error_code = COMPRESS_ERR_COMPRESS;
-		return (qd_exec_result){COMPRESS_ERR_COMPRESS};
+		return (int){COMPRESS_ERR_COMPRESS};
 	}
 
 	strm.next_in = (Bytef*)input;
@@ -77,7 +77,7 @@ qd_exec_result usr_compress_gzip(qd_context* ctx) {
 		qd_string_release(data_elem.value.s);
 		set_error_msg(ctx, "gzip: deflate failed");
 		ctx->error_code = COMPRESS_ERR_COMPRESS;
-		return (qd_exec_result){COMPRESS_ERR_COMPRESS};
+		return (int){COMPRESS_ERR_COMPRESS};
 	}
 
 	size_t output_len = strm.total_out;
@@ -91,34 +91,34 @@ qd_exec_result usr_compress_gzip(qd_context* ctx) {
 	if (!result) {
 		set_error_msg(ctx, "gzip: failed to create result string");
 		ctx->error_code = COMPRESS_ERR_ALLOC;
-		return (qd_exec_result){COMPRESS_ERR_ALLOC};
+		return (int){COMPRESS_ERR_ALLOC};
 	}
 
 	qd_push_s_ref(ctx, result);
 	qd_string_release(result);
 	qd_push_i(ctx, COMPRESS_ERR_OK);
-	return (qd_exec_result){0};
+	return 0;
 }
 
 /**
  * gzip_level - Compress with specific compression level
  * Stack: (data:str level:i64 -- compressed:str)!
  */
-qd_exec_result usr_compress_gzip_level(qd_context* ctx) {
+int usr_compress_gzip_level(qd_context* ctx) {
 	qd_stack_element_t level_elem, data_elem;
 
 	qd_stack_error err = qd_stack_pop(ctx->st, &level_elem);
 	if (err != QD_STACK_OK || level_elem.type != QD_STACK_TYPE_INT) {
 		set_error_msg(ctx, "gzip_level: expected integer level");
 		ctx->error_code = COMPRESS_ERR_INVALID_ARG;
-		return (qd_exec_result){COMPRESS_ERR_INVALID_ARG};
+		return (int){COMPRESS_ERR_INVALID_ARG};
 	}
 
 	err = qd_stack_pop(ctx->st, &data_elem);
 	if (err != QD_STACK_OK || data_elem.type != QD_STACK_TYPE_STR) {
 		set_error_msg(ctx, "gzip_level: expected string data");
 		ctx->error_code = COMPRESS_ERR_INVALID_ARG;
-		return (qd_exec_result){COMPRESS_ERR_INVALID_ARG};
+		return (int){COMPRESS_ERR_INVALID_ARG};
 	}
 
 	int level = (int)level_elem.value.i;
@@ -134,7 +134,7 @@ qd_exec_result usr_compress_gzip_level(qd_context* ctx) {
 		qd_string_release(data_elem.value.s);
 		set_error_msg(ctx, "gzip_level: memory allocation failed");
 		ctx->error_code = COMPRESS_ERR_ALLOC;
-		return (qd_exec_result){COMPRESS_ERR_ALLOC};
+		return (int){COMPRESS_ERR_ALLOC};
 	}
 
 	z_stream strm;
@@ -146,7 +146,7 @@ qd_exec_result usr_compress_gzip_level(qd_context* ctx) {
 		qd_string_release(data_elem.value.s);
 		set_error_msg(ctx, "gzip_level: deflateInit2 failed");
 		ctx->error_code = COMPRESS_ERR_COMPRESS;
-		return (qd_exec_result){COMPRESS_ERR_COMPRESS};
+		return (int){COMPRESS_ERR_COMPRESS};
 	}
 
 	strm.next_in = (Bytef*)input;
@@ -161,7 +161,7 @@ qd_exec_result usr_compress_gzip_level(qd_context* ctx) {
 		qd_string_release(data_elem.value.s);
 		set_error_msg(ctx, "gzip_level: deflate failed");
 		ctx->error_code = COMPRESS_ERR_COMPRESS;
-		return (qd_exec_result){COMPRESS_ERR_COMPRESS};
+		return (int){COMPRESS_ERR_COMPRESS};
 	}
 
 	size_t output_len = strm.total_out;
@@ -174,27 +174,27 @@ qd_exec_result usr_compress_gzip_level(qd_context* ctx) {
 	if (!result) {
 		set_error_msg(ctx, "gzip_level: failed to create result string");
 		ctx->error_code = COMPRESS_ERR_ALLOC;
-		return (qd_exec_result){COMPRESS_ERR_ALLOC};
+		return (int){COMPRESS_ERR_ALLOC};
 	}
 
 	qd_push_s_ref(ctx, result);
 	qd_string_release(result);
 	qd_push_i(ctx, COMPRESS_ERR_OK);
-	return (qd_exec_result){0};
+	return 0;
 }
 
 /**
  * gunzip - Decompress gzip data
  * Stack: (compressed:str -- data:str)!
  */
-qd_exec_result usr_compress_gunzip(qd_context* ctx) {
+int usr_compress_gunzip(qd_context* ctx) {
 	qd_stack_element_t data_elem;
 	qd_stack_error err = qd_stack_pop(ctx->st, &data_elem);
 
 	if (err != QD_STACK_OK || data_elem.type != QD_STACK_TYPE_STR) {
 		set_error_msg(ctx, "gunzip: expected string argument");
 		ctx->error_code = COMPRESS_ERR_INVALID_ARG;
-		return (qd_exec_result){COMPRESS_ERR_INVALID_ARG};
+		return (int){COMPRESS_ERR_INVALID_ARG};
 	}
 
 	const char* input = qd_string_data(data_elem.value.s);
@@ -208,7 +208,7 @@ qd_exec_result usr_compress_gunzip(qd_context* ctx) {
 		qd_string_release(data_elem.value.s);
 		set_error_msg(ctx, "gunzip: memory allocation failed");
 		ctx->error_code = COMPRESS_ERR_ALLOC;
-		return (qd_exec_result){COMPRESS_ERR_ALLOC};
+		return (int){COMPRESS_ERR_ALLOC};
 	}
 
 	z_stream strm;
@@ -221,7 +221,7 @@ qd_exec_result usr_compress_gunzip(qd_context* ctx) {
 		qd_string_release(data_elem.value.s);
 		set_error_msg(ctx, "gunzip: inflateInit2 failed");
 		ctx->error_code = COMPRESS_ERR_DECOMPRESS;
-		return (qd_exec_result){COMPRESS_ERR_DECOMPRESS};
+		return (int){COMPRESS_ERR_DECOMPRESS};
 	}
 
 	strm.next_in = (Bytef*)input;
@@ -242,7 +242,7 @@ qd_exec_result usr_compress_gunzip(qd_context* ctx) {
 			qd_string_release(data_elem.value.s);
 			set_error_msg(ctx, "gunzip: inflate failed");
 			ctx->error_code = COMPRESS_ERR_DECOMPRESS;
-			return (qd_exec_result){COMPRESS_ERR_DECOMPRESS};
+			return (int){COMPRESS_ERR_DECOMPRESS};
 		}
 
 		/* Need more output space */
@@ -255,7 +255,7 @@ qd_exec_result usr_compress_gunzip(qd_context* ctx) {
 				qd_string_release(data_elem.value.s);
 				set_error_msg(ctx, "gunzip: reallocation failed");
 				ctx->error_code = COMPRESS_ERR_ALLOC;
-				return (qd_exec_result){COMPRESS_ERR_ALLOC};
+				return (int){COMPRESS_ERR_ALLOC};
 			}
 			output = new_buf;
 			strm.next_out = output + buf_size;
@@ -274,27 +274,27 @@ qd_exec_result usr_compress_gunzip(qd_context* ctx) {
 	if (!result) {
 		set_error_msg(ctx, "gunzip: failed to create result string");
 		ctx->error_code = COMPRESS_ERR_ALLOC;
-		return (qd_exec_result){COMPRESS_ERR_ALLOC};
+		return (int){COMPRESS_ERR_ALLOC};
 	}
 
 	qd_push_s_ref(ctx, result);
 	qd_string_release(result);
 	qd_push_i(ctx, COMPRESS_ERR_OK);
-	return (qd_exec_result){0};
+	return 0;
 }
 
 /**
  * deflate - Compress with raw deflate (no header)
  * Stack: (data:str -- compressed:str)!
  */
-qd_exec_result usr_compress_deflate(qd_context* ctx) {
+int usr_compress_deflate(qd_context* ctx) {
 	qd_stack_element_t data_elem;
 	qd_stack_error err = qd_stack_pop(ctx->st, &data_elem);
 
 	if (err != QD_STACK_OK || data_elem.type != QD_STACK_TYPE_STR) {
 		set_error_msg(ctx, "deflate: expected string argument");
 		ctx->error_code = COMPRESS_ERR_INVALID_ARG;
-		return (qd_exec_result){COMPRESS_ERR_INVALID_ARG};
+		return (int){COMPRESS_ERR_INVALID_ARG};
 	}
 
 	const char* input = qd_string_data(data_elem.value.s);
@@ -306,7 +306,7 @@ qd_exec_result usr_compress_deflate(qd_context* ctx) {
 		qd_string_release(data_elem.value.s);
 		set_error_msg(ctx, "deflate: memory allocation failed");
 		ctx->error_code = COMPRESS_ERR_ALLOC;
-		return (qd_exec_result){COMPRESS_ERR_ALLOC};
+		return (int){COMPRESS_ERR_ALLOC};
 	}
 
 	z_stream strm;
@@ -319,7 +319,7 @@ qd_exec_result usr_compress_deflate(qd_context* ctx) {
 		qd_string_release(data_elem.value.s);
 		set_error_msg(ctx, "deflate: deflateInit2 failed");
 		ctx->error_code = COMPRESS_ERR_COMPRESS;
-		return (qd_exec_result){COMPRESS_ERR_COMPRESS};
+		return (int){COMPRESS_ERR_COMPRESS};
 	}
 
 	strm.next_in = (Bytef*)input;
@@ -334,7 +334,7 @@ qd_exec_result usr_compress_deflate(qd_context* ctx) {
 		qd_string_release(data_elem.value.s);
 		set_error_msg(ctx, "deflate: compress failed");
 		ctx->error_code = COMPRESS_ERR_COMPRESS;
-		return (qd_exec_result){COMPRESS_ERR_COMPRESS};
+		return (int){COMPRESS_ERR_COMPRESS};
 	}
 
 	size_t output_len = strm.total_out;
@@ -347,27 +347,27 @@ qd_exec_result usr_compress_deflate(qd_context* ctx) {
 	if (!result) {
 		set_error_msg(ctx, "deflate: failed to create result string");
 		ctx->error_code = COMPRESS_ERR_ALLOC;
-		return (qd_exec_result){COMPRESS_ERR_ALLOC};
+		return (int){COMPRESS_ERR_ALLOC};
 	}
 
 	qd_push_s_ref(ctx, result);
 	qd_string_release(result);
 	qd_push_i(ctx, COMPRESS_ERR_OK);
-	return (qd_exec_result){0};
+	return 0;
 }
 
 /**
  * inflate - Decompress raw deflate data
  * Stack: (compressed:str -- data:str)!
  */
-qd_exec_result usr_compress_inflate(qd_context* ctx) {
+int usr_compress_inflate(qd_context* ctx) {
 	qd_stack_element_t data_elem;
 	qd_stack_error err = qd_stack_pop(ctx->st, &data_elem);
 
 	if (err != QD_STACK_OK || data_elem.type != QD_STACK_TYPE_STR) {
 		set_error_msg(ctx, "inflate: expected string argument");
 		ctx->error_code = COMPRESS_ERR_INVALID_ARG;
-		return (qd_exec_result){COMPRESS_ERR_INVALID_ARG};
+		return (int){COMPRESS_ERR_INVALID_ARG};
 	}
 
 	const char* input = qd_string_data(data_elem.value.s);
@@ -380,7 +380,7 @@ qd_exec_result usr_compress_inflate(qd_context* ctx) {
 		qd_string_release(data_elem.value.s);
 		set_error_msg(ctx, "inflate: memory allocation failed");
 		ctx->error_code = COMPRESS_ERR_ALLOC;
-		return (qd_exec_result){COMPRESS_ERR_ALLOC};
+		return (int){COMPRESS_ERR_ALLOC};
 	}
 
 	z_stream strm;
@@ -393,7 +393,7 @@ qd_exec_result usr_compress_inflate(qd_context* ctx) {
 		qd_string_release(data_elem.value.s);
 		set_error_msg(ctx, "inflate: inflateInit2 failed");
 		ctx->error_code = COMPRESS_ERR_DECOMPRESS;
-		return (qd_exec_result){COMPRESS_ERR_DECOMPRESS};
+		return (int){COMPRESS_ERR_DECOMPRESS};
 	}
 
 	strm.next_in = (Bytef*)input;
@@ -414,7 +414,7 @@ qd_exec_result usr_compress_inflate(qd_context* ctx) {
 			qd_string_release(data_elem.value.s);
 			set_error_msg(ctx, "inflate: decompress failed");
 			ctx->error_code = COMPRESS_ERR_DECOMPRESS;
-			return (qd_exec_result){COMPRESS_ERR_DECOMPRESS};
+			return (int){COMPRESS_ERR_DECOMPRESS};
 		}
 
 		if (strm.avail_out == 0) {
@@ -426,7 +426,7 @@ qd_exec_result usr_compress_inflate(qd_context* ctx) {
 				qd_string_release(data_elem.value.s);
 				set_error_msg(ctx, "inflate: reallocation failed");
 				ctx->error_code = COMPRESS_ERR_ALLOC;
-				return (qd_exec_result){COMPRESS_ERR_ALLOC};
+				return (int){COMPRESS_ERR_ALLOC};
 			}
 			output = new_buf;
 			strm.next_out = output + buf_size;
@@ -445,11 +445,11 @@ qd_exec_result usr_compress_inflate(qd_context* ctx) {
 	if (!result) {
 		set_error_msg(ctx, "inflate: failed to create result string");
 		ctx->error_code = COMPRESS_ERR_ALLOC;
-		return (qd_exec_result){COMPRESS_ERR_ALLOC};
+		return (int){COMPRESS_ERR_ALLOC};
 	}
 
 	qd_push_s_ref(ctx, result);
 	qd_string_release(result);
 	qd_push_i(ctx, COMPRESS_ERR_OK);
-	return (qd_exec_result){0};
+	return 0;
 }
