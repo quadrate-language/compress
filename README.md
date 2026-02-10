@@ -65,4 +65,4 @@ Apache-2.0 - See [LICENSE](LICENSE) for details.
 
 ## Contributing
 
-Contributions welcome! Please open an issue or submit a pull request on [GitHub](https://git.sr.ht/~klahr/qdcompress).
+Contributions welcome! Please open an issue or submit a patch on [SourceHut](https://git.sr.ht/~klahr/qdcompress).
