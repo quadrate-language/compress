@@ -3,7 +3,7 @@
  * @brief Compression library implementation using zlib
  */
 
-#include "../include/qdcompress/compress.h"
+#include "quadrate/compress/compress.h"
 #include <quadrate/rt/context.h>
 #include <quadrate/rt/qd_string.h>
 #include <quadrate/rt/runtime.h>
