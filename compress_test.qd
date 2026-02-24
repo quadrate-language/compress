@@ -1,6 +1,6 @@
 // Unit tests for the compress module
 use compress
-use str
+use strings
 use testing
 
 test "compress::gzip roundtrip" {
@@ -69,10 +69,10 @@ test "compress double compression" {
 test "compress larger data" {
 	// Build 320 bytes of data
 	"ABCDEFGHIJ" -> chunk
-	chunk chunk str::concat -> data
-	data data str::concat -> data
-	data data str::concat -> data
-	data data str::concat -> data
-	data data str::concat -> data
+	chunk chunk strings::concat -> data
+	data data strings::concat -> data
+	data data strings::concat -> data
+	data data strings::concat -> data
+	data data strings::concat -> data
 	data compress::gzip! compress::gunzip! data testing::assert_eq
 }
