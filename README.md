@@ -1,11 +1,11 @@
 # compress
 
-Compression and decompression using gzip/zlib for [Quadrate](https://git.sr.ht/~klahr/quadrate).
+Compression and decompression using gzip/zlib for [Quadrate](https://github.com/quadrate-language/quadrate).
 
 ## Installation
 
 ```bash
-quadpm get https://git.sr.ht/~klahr/qdcompress
+quadpm get https://github.com/quadrate-language/compress
 ```
 
 **Note**: This module requires native compilation. The C source files in `src/` must be compiled and linked. Requires zlib.
@@ -65,4 +65,4 @@ Apache-2.0 - See [LICENSE](LICENSE) for details.
 
 ## Contributing
 
-Contributions welcome! Please open an issue or submit a patch on [SourceHut](https://git.sr.ht/~klahr/qdcompress).
+Contributions welcome! Please open an issue or pull request on [GitHub](https://github.com/quadrate-language/compress).
